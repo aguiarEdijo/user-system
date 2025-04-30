@@ -4,7 +4,6 @@ services:
   postgres:
     image: postgres:15
     environment:
-      POSTGRES_HOST_AUTH_METHOD: trust 
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
       POSTGRES_DB: userdb
@@ -33,7 +32,6 @@ services:
   backend:
     build: 
       context: ./backend
-      dockerfile: Dockerfile
     ports:
       - "3001:3001"
     environment:
@@ -53,6 +51,22 @@ services:
     restart: unless-stopped
     volumes:
       - /app/node_modules
+
+  frontend:
+    build:
+      context: ./frontend
+    ports:
+      - "3000:3000"
+    environment:
+      NEXT_PUBLIC_BACKEND_URL: http://backend:3001
+      NODE_ENV: development
+    depends_on:
+      - backend
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+      - /app/.next
+    command: npm run dev
 
 volumes:
   postgres-data:
